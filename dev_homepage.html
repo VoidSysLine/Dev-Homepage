@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Dev Homepage</title>
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzAwZjNmZiIgZD0iTTggMTZsNC00LTQtNGgzLjVsNC40IDQtNC40IDRIOHptLTUuNSA1di0xNGgydjE0aC0yeiIvPjwvc3ZnPg==">    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --dark-bg: #0a192f;
+            --darker-bg: #061024;
+            --text: #8892b0;
+            --highlight: #64ffda;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--dark-bg);
+            font-family: 'Consolas', monospace;
+            color: var(--text);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Matrix-ähnlicher Hintergrund-Effekt */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                rgba(10, 25, 47, 0.9),
+                rgba(10, 25, 47, 0.9)
+            ),
+            repeating-linear-gradient(
+                0deg,
+                transparent 0,
+                transparent 50px,
+                rgba(0, 243, 255, 0.1) 50px,
+                rgba(0, 243, 255, 0.1) 51px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                transparent 0,
+                transparent 50px,
+                rgba(0, 243, 255, 0.1) 50px,
+                rgba(0, 243, 255, 0.1) 51px
+            );
+            z-index: -1;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background: var(--darker-bg);
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+            border: 1px solid rgba(0, 243, 255, 0.1);
+            width: 90%;
+            max-width: 800px;
+        }
+
+        .terminal-header {
+            text-align: left;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--neon-blue);
+            font-size: 0.9rem;
+            color: var(--neon-blue);
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid var(--neon-blue);
+            border-radius: 4px;
+            color: var(--text);
+            font-family: 'Consolas', monospace;
+            font-size: 16px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        .search-button {
+            padding: 12px 24px;
+            background: transparent;
+            color: var(--neon-blue);
+            border: 1px solid var(--neon-blue);
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Consolas', monospace;
+            transition: all 0.3s ease;
+        }
+
+        .search-button:hover {
+            background: rgba(0, 243, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+        }
+
+        .bookmarks-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .bookmark-category {
+            text-align: left;
+        }
+
+        .category-title {
+            color: var(--highlight);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--highlight);
+            padding-bottom: 0.3rem;
+        }
+
+        .bookmark-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .bookmark {
+            text-decoration: none;
+            color: #fff;
+            padding: 8px;
+            background: rgba(0, 243, 255, 0.05);
+            border: 1px solid transparent;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .bookmark:hover {
+            border-color: var(--neon-blue);
+            background: rgba(0, 243, 255, 0.1);
+            color: var(--neon-blue);
+            transform: translateX(5px);
+        }
+
+        .datetime {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: var(--neon-blue);
+            background: rgba(0, 243, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            font-family: 'DS-Digital', 'Consolas', monospace;
+            display: grid;
+            gap: 0.5rem;
+            min-width: 200px;
+        }
+
+        .datetime-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .time {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+
+        .date {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .weekday {
+            color: var(--highlight);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .calendar-week {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .tech-footer {
+        width: 100%;
+        padding: 1rem;
+        background: var(--darker-bg);
+        border-top: 1px solid var(--neon-blue);
+        text-align: center;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 1;
+    }
+
+        .footer-content {
+            color: var(--text);
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-badge {
+            background: rgba(0, 243, 255, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            border: 1px solid var(--neon-blue);
+            font-family: 'Consolas', monospace;
+            color: var(--neon-blue);
+            font-size: 0.8rem;
+        }
+
+        .tech-stack {
+            display: inline-flex;
+            gap: 1rem;
+            margin-left: 1rem;
+            padding-left: 1rem;
+            border-left: 1px solid rgba(0, 243, 255, 0.3);
+        }
+
+        .tech-item {
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .tech-item:hover {
+            opacity: 1;
+            color: var(--neon-blue);
+            transform: translateY(-2px);
+        }
+
+        .version {
+            color: var(--neon-blue);
+            opacity: 0.7;
+            margin-left: 0.3rem;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .cursor {
+            display: inline-block;
+            color: var(--neon-blue);
+            animation: blink 1s infinite;
+            margin-left: 0.2rem;
+        }
+
+        @font-face {
+            font-family: 'DS-Digital';
+            src: url('https://db.onlinewebfonts.com/t/8e22783d707ad140bffe18b2a3812529.woff2') format('woff2');
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- DateTime Box oben rechts -->
+    <div class="datetime" id="datetime">
+        <div class="datetime-section">
+            <span class="time" id="time">00:00:00</span>
+        </div>
+        <div class="datetime-section">
+            <span class="date" id="date">01.01.2024</span>
+        </div>
+        <div class="datetime-section">
+            <span class="weekday" id="weekday">Montag</span>
+            <span class="calendar-week" id="calendar-week">KW 01</span>
+        </div>
+    </div>
+
+    <!-- Terminal Widget -->
+    <div class="container">
+        <div class="terminal-header">
+            student@developer:~$ _
+        </div>
+
+        <form class="search-form" action="https://duckduckgo.com/" method="get" target="_blank">
+            <input type="text" name="q" class="search-input" placeholder="search://" autofocus>
+            <button type="submit" class="search-button">Execute</button>
+        </form>
+
+        <div class="bookmarks-container">
+            <div class="bookmark-category">
+                <div class="category-title">// Documentation</div>
+                <div class="bookmark-list">
+                    <a href="https://developer.mozilla.org" class="bookmark" target="_blank">→ MDN Web Docs</a>
+                    <a href="https://devdocs.io" class="bookmark" target="_blank">→ DevDocs</a>
+                    <a href="https://www.w3schools.com" class="bookmark" target="_blank">→ W3Schools</a>
+                </div>
+            </div>
+
+            <div class="bookmark-category">
+                <div class="category-title">// Development</div>
+                <div class="bookmark-list">
+                    <a href="https://github.com" class="bookmark" target="_blank">→ GitHub</a>
+                    <a href="https://stackoverflow.com" class="bookmark"  target="_blank">→ Stack Overflow</a>
+                    <a href="https://dev.to" class="bookmark"  target="_blank">→ DEV Community</a>
+                </div>
+            </div>
+
+            <div class="bookmark-category">
+                <div class="category-title">// Tools</div>
+                <div class="bookmark-list">
+                    <a href="https://codepen.io" class="bookmark"  target="_blank">→ CodePen</a>
+                    <a href="https://jwt.io" class="bookmark"  target="_blank">→ JWT Decoder</a>
+                    <a href="https://regex101.com" class="bookmark"  target="_blank">→ Regex101</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="tech-footer">
+        <div class="footer-content">
+            <span class="footer-badge">BUILD_2024.01</span>
+            <div class="tech-stack">
+                <span class="tech-item">HTML<span class="version">5</span></span>
+                <span class="tech-item">CSS<span class="version">3</span></span>
+                <span class="tech-item">JavaScript<span class="version">ES6+</span></span>
+            </div>
+            <span class="cursor">_</span>
+        </div>
+    </footer>
+    <script>
+		function getWeekNumber(date) {
+			// Copy date to prevent mutation
+			const target = new Date(date.valueOf());
+			
+			// Get first day of year
+			const firstDayOfYear = new Date(target.getFullYear(), 0, 1);
+			
+			// Get Thursday in the target week
+			target.setDate(target.getDate() + 3 - ((target.getDay() + 6) % 7));
+			
+			// Calculate full weeks between first day of year and target Thursday
+			const weekNumber = Math.floor(((target - firstDayOfYear) / 86400000 + 1) / 7);
+			
+			return weekNumber + 1; // Add 1 because weeks start from 1, not 0
+		}
+
+		function updateDateTime() {
+			const now = new Date();
+			// Wochentage-Array: Index 0 ist Sonntag in JavaScript
+			const weekdays = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+			
+			// Zeit formatieren
+			const timeString = now.toLocaleTimeString('de-DE', {
+				hour: '2-digit',
+				minute: '2-digit',
+				second: '2-digit',
+				hour12: false
+			});
+
+			// Datum formatieren
+			const dateString = now.toLocaleDateString('de-DE', {
+				day: '2-digit',
+				month: '2-digit',
+				year: 'numeric'
+			});
+
+			// Wochentag - Direkter Zugriff auf das Array mit dem korrekten Index
+			const weekday = weekdays[now.getDay()];
+
+			// Kalenderwoche
+			const weekNumber = getWeekNumber(now);
+			const weekNumberString = weekNumber.toString().padStart(2, '0');
+
+			// DOM aktualisieren
+			document.getElementById('time').textContent = timeString;
+			document.getElementById('date').textContent = dateString;
+			document.getElementById('weekday').textContent = weekday;
+			document.getElementById('calendar-week').textContent = `KW ${weekNumberString}`;
+		}
+        
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Terminal-Einstellungen
+        const TERMINAL_CONFIG = {
+            defaultPrompt: 'student@developer:~$ ',
+            maxHistoryItems: 10,
+            typingSpeed: 100,  // Millisekunden pro Zeichen
+            initCommands: [
+                'initializing system...',
+                'checking dependencies...',
+                'loading environment...',
+                'starting development server...',
+                'ready'
+            ]
+        };
+
+        // Klasse für Terminal-Funktionalität
+        class Terminal {
+            constructor(headerElement, config = TERMINAL_CONFIG) {
+                this.headerElement = headerElement;
+                this.config = config;
+                this.history = [];
+                this.historyIndex = -1;
+                this.currentPrompt = config.defaultPrompt;
+                
+                // Terminal-Historie im localStorage speichern
+                this.loadHistory();
+                this.setupEventListeners();
+            }
+
+            // Historie aus localStorage laden
+            loadHistory() {
+                const savedHistory = localStorage.getItem('terminalHistory');
+                this.history = savedHistory ? JSON.parse(savedHistory) : [];
+            }
+
+            // Historie in localStorage speichern
+            saveHistory() {
+                localStorage.setItem('terminalHistory', JSON.stringify(this.history));
+            }
+
+            // Fügt einen neuen Befehl zur Historie hinzu
+            addToHistory(command) {
+                this.history.unshift(command);
+                if (this.history.length > this.config.maxHistoryItems) {
+                    this.history.pop();
+                }
+                this.saveHistory();
+            }
+
+            // Animiert das Schreiben von Text
+            async typeText(text) {
+                let currentText = '';
+                for (const char of text) {
+                    currentText += char;
+                    this.headerElement.textContent = currentText;
+                    await new Promise(resolve => setTimeout(resolve, this.config.typingSpeed));
+                }
+                return currentText;
+            }
+
+            // Initialisierungsanimation
+            async playInitSequence() {
+                for (const command of this.config.initCommands) {
+                    await this.typeText(command);
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+                // Nach der Animation den Standard-Prompt setzen
+                this.headerElement.textContent = this.currentPrompt;
+            }
+
+            // Prompt ändern
+            setPrompt(newPrompt) {
+                this.currentPrompt = newPrompt;
+                this.headerElement.textContent = this.currentPrompt;
+            }
+
+            // Event Listener für Tastatureingaben
+            setupEventListeners() {
+                document.addEventListener('keydown', (e) => {
+                    // Pfeiltasten für Historie
+                    if (e.key === 'ArrowUp') {
+                        this.navigateHistory('up');
+                    } else if (e.key === 'ArrowDown') {
+                        this.navigateHistory('down');
+                    }
+                });
+            }
+
+            // Durch Historie navigieren
+            navigateHistory(direction) {
+                if (direction === 'up' && this.historyIndex < this.history.length - 1) {
+                    this.historyIndex++;
+                } else if (direction === 'down' && this.historyIndex > -1) {
+                    this.historyIndex--;
+                }
+
+                if (this.historyIndex === -1) {
+                    document.querySelector('.search-input').value = '';
+                } else {
+                    document.querySelector('.search-input').value = this.history[this.historyIndex];
+                }
+            }
+        }
+
+        // Terminal initialisieren und in die Seite einbinden
+        document.addEventListener('DOMContentLoaded', () => {
+            const terminalHeader = document.querySelector('.terminal-header');
+            const terminal = new Terminal(terminalHeader);
+            
+            // Suchformular mit Terminal-Historie verbinden
+            const searchForm = document.querySelector('.search-form');
+            searchForm.addEventListener('submit', (e) => {
+                const searchInput = document.querySelector('.search-input');
+                terminal.addToHistory(searchInput.value);
+            });
+
+            // Initialisierungsanimation abspielen
+            terminal.playInitSequence();
+        });
+
+        // Funktion zum Ändern des Prompts (kann von außen aufgerufen werden)
+        function changePrompt(newPrompt) {
+            const terminalHeader = document.querySelector('.terminal-header');
+            const terminal = new Terminal(terminalHeader);
+            terminal.setPrompt(newPrompt);
+        }
+
+
+    </script>
+</body>
+</html>
