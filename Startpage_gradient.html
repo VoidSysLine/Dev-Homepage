@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Startseite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 25%, #2d3561 50%, #4a3474 75%, #6b2c5c 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtiler Gradient-Overlay für mehr Tiefe */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center bottom, rgba(139, 69, 255, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .container {
+            text-align: center;
+            z-index: 1;
+            width: 90%;
+            max-width: 600px;
+        }
+
+        .time-display {
+            font-size: 4rem;
+            font-weight: 200;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1rem;
+            letter-spacing: -2px;
+        }
+
+        .date-display {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 3rem;
+            font-weight: 300;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            color: white;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-box:focus {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 12px 40px rgba(139, 69, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .search-box::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .quick-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .quick-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.3s ease;
+            padding: 1rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.05);
+            min-width: 80px;
+        }
+
+        .quick-link:hover {
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .quick-link-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .quick-link-text {
+            font-size: 0.9rem;
+            font-weight: 300;
+        }
+
+        /* Settings Button */
+        .settings-btn {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+            z-index: 1000;
+        }
+
+        .settings-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.9);
+            transform: rotate(90deg);
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 350px;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(30px);
+            padding: 2rem;
+            transition: right 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+        }
+
+        .settings-panel.open {
+            right: 0;
+        }
+
+        .settings-title {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .setting-group {
+            margin-bottom: 2rem;
+        }
+
+        .setting-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            display: block;
+            font-weight: 300;
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .theme-option {
+            padding: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            color: white;
+            font-size: 0.9rem;
+            border: 2px solid transparent;
+        }
+
+        .theme-option.active {
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .theme-default { background: linear-gradient(135deg, #0f1419, #6b2c5c); }
+        .theme-ocean { background: linear-gradient(135deg, #0d1421, #1e3a8a); }
+        .theme-sunset { background: linear-gradient(135deg, #1a0f0f, #dc2626); }
+        .theme-forest { background: linear-gradient(135deg, #0a1f0a, #059669); }
+        .theme-aurora { background: linear-gradient(135deg, #0f1b2e, #0891b2); }
+        .theme-volcano { background: linear-gradient(135deg, #1f0f0f, #dc2626); }
+        .theme-lavender { background: linear-gradient(135deg, #1a0f2e, #8b5cf6); }
+        .theme-mint { background: linear-gradient(135deg, #0f1f1a, #10b981); }
+
+        .search-engine-select {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .search-engine-select option {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .close-settings {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-settings:hover {
+            color: white;
+        }
+
+        /* Theme Classes */
+        .theme-ocean {
+            background: linear-gradient(135deg, #0d1421 0%, #1a2332 25%, #2d3561 50%, #1e3a8a 75%, #3b4f8a 100%);
+        }
+
+        .theme-sunset {
+            background: linear-gradient(135deg, #4a1a00  0%, #b34e00  25%, #ff8c00  50%, #ffb347 75%, #ffc95f  100%);
+        }
+
+        .theme-forest {
+            background: linear-gradient(135deg, #0a1f0a 0%, #1a2f1a 25%, #2d4a2d 50%, #059669 75%, #3f8a5f 100%);
+        }
+
+        .theme-aurora {
+            background: linear-gradient(135deg, #0f1b2e 0%, #1a2f4a 25%, #2d4a6b 50%, #0891b2 75%, #3f7a9a 100%);
+        }
+
+        .theme-volcano {
+            background: linear-gradient(135deg, #1f0f0f 0%, #2d1a1a 25%, #4a2c2c 50%, #dc2626 75%, #a54040 100%);
+        }
+
+        .theme-lavender {
+            background: linear-gradient(135deg, #1a0f2e 0%, #2d1a4a 25%, #4a2d6b 50%, #8b5cf6 75%, #7a4fc4 100%);
+        }
+
+        .theme-mint {
+            background: linear-gradient(135deg, #0f1f1a 0%, #1a2f2d 25%, #2d4a4a 50%, #10b981 75%, #4f9a7a 100%);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .time-display {
+                font-size: 3rem;
+            }
+            
+            .quick-links {
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Settings Button -->
+    <button class="settings-btn" id="settingsBtn">⚙️</button>
+    
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="settingsPanel">
+        <button class="close-settings" id="closeSettings">×</button>
+        <h2 class="settings-title">Einstellungen</h2>
+        
+        <div class="setting-group">
+            <label class="setting-label">Theme auswählen</label>
+            <div class="theme-grid">
+                <div class="theme-option theme-default active" data-theme="default">
+                    Standard
+                </div>
+                <div class="theme-option theme-ocean" data-theme="ocean">
+                    Ozean
+                </div>
+                <div class="theme-option theme-sunset" data-theme="sunset">
+                    Sonnenuntergang
+                </div>
+                <div class="theme-option theme-forest" data-theme="forest">
+                    Wald
+                </div>
+                <div class="theme-option theme-aurora" data-theme="aurora">
+                    Aurora
+                </div>
+                <div class="theme-option theme-volcano" data-theme="volcano">
+                    Vulkan
+                </div>
+                <div class="theme-option theme-lavender" data-theme="lavender">
+                    Lavendel
+                </div>
+                <div class="theme-option theme-mint" data-theme="mint">
+                    Mint
+                </div>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <label class="setting-label">Suchmaschine</label>
+            <select class="search-engine-select" id="searchEngineSelect">
+                <option value="google">Google</option>
+                <option value="duckduckgo">DuckDuckGo</option>
+                <option value="bing">Bing</option>
+                <option value="startpage">Startpage</option>
+                <option value="ecosia">Ecosia</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="time-display" id="time"></div>
+        <div class="date-display" id="date"></div>
+        
+        <div class="search-container">
+            <input type="text" class="search-box" placeholder="Suche oder gib eine URL ein..." id="searchInput">
+        </div>
+        
+        <!-- Font Awesome einbinden -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+        <div class="quick-links">
+            <a href="https://gmail.com" class="quick-link" target="_blank" rel="noopener noreferrer">
+                <div class="quick-link-icon"><i class="fas fa-envelope"></i></div>
+                <div class="quick-link-text">Gmail</div>
+            </a>
+            <a href="https://youtube.com" class="quick-link" target="_blank" rel="noopener noreferrer">
+                <div class="quick-link-icon"><i class="fab fa-youtube"></i></div>
+                <div class="quick-link-text">YouTube</div>
+            </a>
+            <a href="https://github.com" class="quick-link" target="_blank" rel="noopener noreferrer">
+                <div class="quick-link-icon"><i class="fab fa-github"></i></div>
+                <div class="quick-link-text">GitHub</div>
+            </a>
+            <a href="https://reddit.com" class="quick-link" target="_blank" rel="noopener noreferrer">
+                <div class="quick-link-icon"><i class="fab fa-reddit"></i></div>
+                <div class="quick-link-text">Reddit</div>
+            </a>
+            <a href="https://twitter.com" class="quick-link" target="_blank" rel="noopener noreferrer">
+                <div class="quick-link-icon"><i class="fab fa-x-twitter"></i></div>
+                <div class="quick-link-text">Twitter</div>
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        // Zeit und Datum aktualisieren
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('de-DE', { 
+                hour: '2-digit', 
+                minute: '2-digit'
+            });
+            const dateString = now.toLocaleDateString('de-DE', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            document.getElementById('time').textContent = timeString;
+            document.getElementById('date').textContent = dateString;
+        }
+
+        // Suchfunktion
+        function handleSearch(query) {
+            if (!query.trim()) return;
+
+            const searchEngine = localStorage.getItem('searchEngine') || 'google';
+            const inputField = document.getElementById('searchInput');
+
+            if (query.includes('.') && !query.includes(' ')) {
+                if (!query.startsWith('http://') && !query.startsWith('https://')) {
+                    query = 'https://' + query;
+                }
+                window.open(query, "_blank");
+            } else {
+                const searchUrls = {
+                    google: `https://www.google.com/search?q=${encodeURIComponent(query)}`,
+                    duckduckgo: `https://duckduckgo.com/?q=${encodeURIComponent(query)}`,
+                    bing: `https://www.bing.com/search?q=${encodeURIComponent(query)}`,
+                    startpage: `https://www.startpage.com/search?query=${encodeURIComponent(query)}`,
+                    ecosia: `https://www.ecosia.org/search?q=${encodeURIComponent(query)}`
+                };
+                window.open(searchUrls[searchEngine], "_blank");
+            }
+
+            // Eingabefeld leeren
+            inputField.value = "";
+            inputField.blur();
+        }
+
+
+        // Theme Management
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'default';
+            applyTheme(savedTheme);
+            
+            // Update active theme in UI
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.classList.remove('active');
+                if (option.dataset.theme === savedTheme) {
+                    option.classList.add('active');
+                }
+            });
+        }
+
+        function applyTheme(theme) {
+            const body = document.body;
+            body.className = body.className.replace(/theme-\w+/g, '');
+            
+            if (theme !== 'default') {
+                body.classList.add(`theme-${theme}`);
+            }
+            
+            localStorage.setItem('theme', theme);
+        }
+
+        // Search Engine Management
+        function loadSearchEngine() {
+            const savedEngine = localStorage.getItem('searchEngine') || 'google';
+            document.getElementById('searchEngineSelect').value = savedEngine;
+        }
+
+        // Event Listeners
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleSearch(this.value);
+            }
+        });
+
+        // Settings Panel
+        document.getElementById('settingsBtn').addEventListener('click', function() {
+            document.getElementById('settingsPanel').classList.add('open');
+        });
+
+        document.getElementById('closeSettings').addEventListener('click', function() {
+            document.getElementById('settingsPanel').classList.remove('open');
+        });
+
+        // Theme Selection
+        document.querySelectorAll('.theme-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const theme = this.dataset.theme;
+                applyTheme(theme);
+                
+                // Update active state
+                document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Search Engine Selection
+        document.getElementById('searchEngineSelect').addEventListener('change', function() {
+            localStorage.setItem('searchEngine', this.value);
+        });
+
+        // Close settings when clicking outside
+        document.addEventListener('click', function(e) {
+            const settingsPanel = document.getElementById('settingsPanel');
+            const settingsBtn = document.getElementById('settingsBtn');
+            
+            if (!settingsPanel.contains(e.target) && !settingsBtn.contains(e.target)) {
+                settingsPanel.classList.remove('open');
+            }
+        });
+
+        // Keyboard shortcut for settings (Escape to close)
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.getElementById('settingsPanel').classList.remove('open');
+                return;
+            }
+            
+            // Fokus auf Suchfeld bei Tastendruck
+            if (document.activeElement === document.getElementById('searchInput')) return;
+            if (document.getElementById('settingsPanel').classList.contains('open')) return;
+            
+            // Ignoriere Sondertasten
+            if (e.ctrlKey || e.altKey || e.metaKey) return;
+            if (e.key.length > 1) return; // Ignoriere F1, Arrow keys, etc.
+            
+            // Fokussiere Suchfeld und füge Zeichen hinzu
+            const searchInput = document.getElementById('searchInput');
+            searchInput.focus();
+            searchInput.value = e.key;
+        });
+
+        // Starte Uhr
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Load saved settings
+        loadTheme();
+        loadSearchEngine();
+
+        // Smooth Animations beim Laden
+        window.addEventListener('load', function() {
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.5s ease';
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
